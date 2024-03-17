@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translation Service</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, black, purple);
+            color: white; /* Set text color to white for better readability */
+            padding: 20px; /* Add some padding for better layout */
+        }
+        h1 {
+            text-align: center; /* Center align the heading */
+        }
+        #translationForm {
+            text-align: center; /* Center align the form */
+        }
+        #inputText {
+            width: 80%; /* Set textarea width to 80% of the container */
+            margin: 10px auto; /* Add margin for better spacing */
+        }
+        #translatedText {
+            margin-top: 20px; /* Add margin at the top of translated text */
+            text-align: center; /* Center align the translated text */
+        }
+    </style>
+</head>
+<body>
+    <h1>Translation Service</h1>
+    <form id="translationForm">
+        <label for="inputText">Enter text to translate:</label><br>
+        <textarea id="inputText" name="inputText" rows="4" cols="50"></textarea><br>
+        <button type="submit">Translate</button>
+    </form>
+    <div id="translatedText"></div>
+
+    <script>
+        document.getElementById("translationForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            
+            var text = document.getElementById("inputText").value;
+            fetch("/translate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ text: text })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("translatedText").innerText = "Translated text: " + data.translated_text;
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    </script>
+</body>
+</html>
