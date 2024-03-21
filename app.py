@@ -6,22 +6,25 @@ local_model_dir = "peft_model/"
 HUGGING_FACE_USER_NAME = "elalimy"
 model_name = "my_awesome_peft_finetuned_helsinki_model"
 peft_model_id = f"{HUGGING_FACE_USER_NAME}/{model_name}"
-# Load model configuration (assuming it's saved locally)
-config = PeftConfig.from_pretrained(local_model_dir, local_files_only=True)
-# Load the base model from its local directory (replace with actual model type)cdd
-model = AutoModelForSeq2SeqLM.from_pretrained(
-    local_model_dir, return_dict=True, load_in_8bit=False)
-# Load the tokenizer from its local directory (replace with actual tokenizer type)
-tokenizer = AutoTokenizer.from_pretrained(local_model_dir, local_files_only=True)
-# # Load the Peft model (assuming it's a custom class or adaptation)
-AI_model = PeftModel.from_pretrained(model, peft_model_id)
 
-
-# Flask appclss
+# Flask app class
 app = Flask(__name__, template_folder='templates')  # Specify the templates folder
 
 
-def generate_translation(model, tokenizer, source_text, device="cpu"):
+def generate_translation(source_text, device="cpu"):
+    # Load model configuration (assuming it's saved locally)
+    config = PeftConfig.from_pretrained(local_model_dir, local_files_only=True)
+
+    # Load the base model from its local directory (replace with actual model type)
+    model = AutoModelForSeq2SeqLM.from_pretrained(
+        local_model_dir, return_dict=True, load_in_8bit=False)
+
+    # Load the tokenizer from its local directory (replace with actual tokenizer type)
+    tokenizer = AutoTokenizer.from_pretrained(local_model_dir, local_files_only=True)
+
+    # Load the Peft model (assuming it's a custom class or adaptation)
+    AI_model = PeftModel.from_pretrained(model, peft_model_id)
+
     # Encode the source text
     input_ids = tokenizer.encode(source_text, return_tensors='pt').to(device)
 
@@ -56,7 +59,7 @@ def translate_text():
         return jsonify({'error': 'No text to translate provided'}), 400
 
     text_to_translate = data['text']
-    translated_text = generate_translation(AI_model, tokenizer, text_to_translate)
+    translated_text = generate_translation(text_to_translate)
 
     return jsonify({'translated_text': translated_text})
 
