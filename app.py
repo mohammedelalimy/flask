@@ -2,7 +2,6 @@ from peft import PeftModel, PeftConfig
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 from flask import Flask, render_template, request, jsonify
 
-local_model_dir = "peft_model/"
 HUGGING_FACE_USER_NAME = "elalimy"
 model_name = "my_awesome_peft_finetuned_helsinki_model"
 peft_model_id = f"{HUGGING_FACE_USER_NAME}/{model_name}"
@@ -13,14 +12,12 @@ app = Flask(__name__, template_folder='templates')  # Specify the templates fold
 
 def generate_translation(source_text, device="cpu"):
     # Load model configuration (assuming it's saved locally)
-    config = PeftConfig.from_pretrained(local_model_dir, local_files_only=True)
-
+    config = PeftConfig.from_pretrained(peft_model_id)
     # Load the base model from its local directory (replace with actual model type)
-    model = AutoModelForSeq2SeqLM.from_pretrained(
-        local_model_dir, return_dict=True, load_in_8bit=False)
+    model = AutoModelForSeq2SeqLM.from_pretrained(config.base_model_name_or_path, return_dict=True, load_in_8bit=False)
 
     # Load the tokenizer from its local directory (replace with actual tokenizer type)
-    tokenizer = AutoTokenizer.from_pretrained(local_model_dir, local_files_only=True)
+    tokenizer = AutoTokenizer.from_pretrained(config.base_model_name_or_path)
 
     # Load the Peft model (assuming it's a custom class or adaptation)
     AI_model = PeftModel.from_pretrained(model, peft_model_id)
